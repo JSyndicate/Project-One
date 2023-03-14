@@ -5,13 +5,73 @@ Werkzeug Documentation:  https://werkzeug.palletsprojects.com/
 This file contains the routes for your application.
 """
 
+import os
 from app import app
-from flask import render_template, request, redirect, url_for
+from app import app, db
+from flask import render_template, request, redirect, url_for, flash, send_from_directory
+from app.forms import Add_New_Property_Form
+from app.models import Profile_Property
+from werkzeug.utils import secure_filename
 
 
 ###
 # Routing for your application.
 ###
+
+@app.route('/properties/create', methods = ['POST', 'GET'])
+def create():
+
+    form = Add_New_Property_Form()
+
+    if request.method == "POST":
+        if form.validate_on_submit:
+           Type = request.form['Type']
+           Photo = request.form['Photo']
+           Title_of_Property = request.form['Title_of_Property']
+           Number_of_Bedrooms = request.form['Number_of_Bedrooms']
+           Number_of_Bathrooms = request.form['Number_of_Bathrooms']
+           Location = request.form['Location']
+           Price = request.form['Price']
+           Description = request.form['Description']
+
+           filename = secure_filename(Photo.filenmae)
+           Photo.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+           enter = Profile_Property(Type, Title_of_Property, Number_of_Bedrooms, Number_of_Bathrooms, Location, Price, Description)
+           flash('File Upload Successfully')
+           db.session.add(enter)
+           db.session.commit
+
+           return redirect(url_for('properties.html'))
+
+
+    return render_template('create.html', form=form)
+
+@app.route('/properties')
+def properties():
+    properties = db. session.execute(db.select(Profile_Property)).scalars()
+    return render_template('properties.html', properties = properties)
+
+@app.route('/properties/<property_id>')
+def propertyid(property_id):
+    property_id = int(property_id)
+    estate = db.session.execute(db.select(Profile_Property).filter_by(id=property_id).scalar_one)
+    return render_template('propertyid.html', property = estate)
+
+def get_images():
+    rootdir = os.getcwd()
+    filelist=[]
+
+    for subdir, dirs, files in os.walk(rootdir + '/uploads'):
+        for file in files:
+            filelist.append(file)
+        return filelist
+    
+@app.route('/upload/<filenmae>')
+def get_uploaded_images(filename):
+    rootdir = os.getcwd()
+    return send_from_directory(os.path.join(rootdir,app.config['UPLOADED_FOLDER']), filename)
+
 
 @app.route('/')
 def home():
@@ -22,7 +82,7 @@ def home():
 @app.route('/about/')
 def about():
     """Render the website's about page."""
-    return render_template('about.html', name="Mary Jane")
+    return render_template('about.html', name="Real Estate")
 
 
 ###

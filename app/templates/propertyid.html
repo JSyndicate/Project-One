@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block main %}
+
+<div class="row">
+    <div class="col-lg">
+        <div class="card mb-3">
+            <div class="body">
+                <img class="col-sm-6" src="{{ url_for('get_uploaded_images', filename=property.filename) }}"/>
+                <div class="col-sm-6">
+                    <h3 class="tile">{{ property.Title_of_Property}} </h3>
+                    
+                    <br>
+                    <span class="badge round-pill bg-primary">
+                        <p class="text">${{property.Price}}.00</p>
+                    </span>
+                    <span class="badge round-pill bg-warning">
+                        <p class="text">${{property.Type}}</p>
+                    </span>
+                    <br>
+
+                    <br>
+                    <p class="text">Description: {{property.Description}}</p>
+                    <br>
+
+                    <span>
+                        <p class="text">
+                            <img class="sym" src="{{ url_for('static', filename='') }}"/> 
+                            {{property.Number_of_Rooms}} Bedrooms
+                        </p>
+                    </span>
+                    <span>
+                        <p class="text">
+                            <span>
+                                <img class="sym" src="{{ url_for('static', filename='') }}"/>
+                            </span>
+                            {{property.Number_of_Bathrooms}} Bathrooms
+                        </p>
+                    </span>
+                    <p class="text">
+                        <span>
+                            <i class="bi bi-geo-alt"></i>
+                        </span>
+                        Locaion: {{property.Location}}
+                    </p>
+                    <a href="#" class="btn btn-primary">Email Realtor</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
